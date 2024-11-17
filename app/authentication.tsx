@@ -1,10 +1,9 @@
 import { useAuthSession } from "@/providers/authctx";
 import { storeData } from "@/utils/local_storage";
-import {router, useRouter} from "expo-router";
+import { router, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import * as authApi from "@/api/authApi";
-import {async} from "@firebase/util";
 
 const Authentication = () => {
   const [userName, setUserName] = useState("");
@@ -16,12 +15,12 @@ const Authentication = () => {
 
   const handleSignIn = async () => {
     try {
-        await authApi.signIn(userEmail, password);
-        router.navigate("/authenticated/(app)/(tabs)");
+      await authApi.signIn(userEmail, password);
+      router.navigate("/authenticated/(app)/(tabs)");
     } catch (error) {
-        console.log("Error signing in:", error);
+      console.log("Error signing in:", error);
     }
-  }
+  };
 
   const handleSignUp = async () => {
     try {
@@ -82,11 +81,9 @@ const Authentication = () => {
                 onPress={() => {
                   console.log("Button pressed. isSignUp:", isSignUp);
                   if (isSignUp) {
-                  //  authApi.signUp(userEmail, password, userName);
-                    handleSignUp( ).then(r => router.push("/authenticated/(app)/(tabs)"));
+                    handleSignUp().then(r => router.push("/authenticated/(app)/(tabs)"));
                   } else {
                     console.log("Attempting to sign in with email:", userEmail, "and password:", password);
-                    //signIn(userEmail, password);
                     handleSignIn().then(r => console.log("handleSignIn", r));
                   }
                 }}
@@ -104,6 +101,12 @@ const Authentication = () => {
                 </Pressable>
             )}
           </View>
+          <Pressable
+              style={styles.backButton}
+              onPress={() => router.push("/")}
+          >
+            <Text style={styles.buttonText}>Tilbake</Text>
+          </Pressable>
         </View>
       </View>
   );
@@ -160,6 +163,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: "gray",
+  },
+  backButton: {
+    marginTop: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 4,
+    backgroundColor: "#0096C7",
   },
   buttonText: {
     color: "white",

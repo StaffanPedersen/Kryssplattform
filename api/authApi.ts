@@ -34,7 +34,7 @@ export const signUp = async (email: string, password: string, username: string) 
         console.log("User signed up", userCredential.user.email);
         console.log("User signed up", userCredential.user.displayName);
         return userCredential.user;
-    } catch (error) {
+    }catch (error: any) {
         console.log(`Oops! ${error.code} message: ${error.message}`);
         throw error;
     }

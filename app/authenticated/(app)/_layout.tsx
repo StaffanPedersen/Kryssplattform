@@ -2,7 +2,7 @@ import { useAuthSession } from "@/providers/authctx";
 import { Redirect, Stack } from "expo-router";
 import { Text, View } from "react-native";
 
-export default function AppLayout() {
+export default function RootLayout() {
     const { userNameSession, isLoading, user } = useAuthSession();
 
     if (isLoading) {
@@ -33,7 +33,31 @@ export default function AppLayout() {
                     animation: "slide_from_left",
                 }}
             />
-            <Stack.Screen name="postDetails/[id]" />
+            <Stack.Screen
+                name="index"
+                options={{
+                    title: "Home",
+                    headerStyle: {
+                        backgroundColor: '#f4511e',
+                    },
+                    headerTintColor: '#d7d1d1',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                }}
+            />
+            <Stack.Screen
+                name="postDetails/[id]"
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#f4511e',
+                    },
+                    headerTintColor: '#d7d1d1',
+                    headerTitleStyle: {
+                        fontWeight: 'bold',
+                    },
+                }}
+            />
         </Stack>
     );
 }
