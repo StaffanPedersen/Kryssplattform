@@ -14,7 +14,6 @@ export default function RootLayout() {
                     alignItems: "center",
                 }}
             >
-                <Text>Henter bruker...</Text>
             </View>
         );
     }

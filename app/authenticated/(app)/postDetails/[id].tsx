@@ -18,7 +18,7 @@ import * as commentApi from "@/api/commentApi";
 import { useAuthSession } from "@/providers/authctx";
 
 export default function postDetails() {
-  const { id } = useLocalSearchParams();
+  const {id} = useLocalSearchParams();
   const [post, setPost] = useState<PostData | null>(null);
   const [postComments, setPostComments] = useState<CommentObject[]>([]);
   const [postLocation, setPostLocation] = useState("Laster");
@@ -30,7 +30,7 @@ export default function postDetails() {
 
   const visibleCommentIds = useRef<string[]>([]);
 
-  const { userNameSession, user } = useAuthSession();
+  const {userNameSession, user} = useAuthSession();
 
   const router = useRouter();
 
@@ -59,187 +59,194 @@ export default function postDetails() {
         latitude: backendPost.postCoordinates?.latitude ?? 0,
         longitude: backendPost.postCoordinates?.longitude ?? 0,
       });
-      setPostLocation(location[0]?.name ?? "Ukjent");
+      if (location && location.length > 0) {
+        setPostLocation(location[0].name ?? "Ukjent");
+      } else {
+        setPostLocation("Ukjent");
+      }
+
     }
-  };
+  }
 
-  useEffect(() => {
-    fetchPostFromBackend();
-  }, []);
+    useEffect(() => {
+      fetchPostFromBackend();
+    }, []);
 
-  return (
-      <View
-          style={{
-            flex: 1,
-          }}
-      >
-        <Stack.Screen
-            options={{
-              headerTitle: (props) => <Text>PostDetaljer</Text>,
-              headerRight: () => (
-                  <Pressable
-                      onPress={async () => {
-                        await postApi.deletePost(id as string);
-                        router.back();
-                      }}
-                  >
-                    <Text>Slett innlegg</Text>
-                  </Pressable>
-              ),
+    return (
+        <View
+            style={{
+              flex: 1,
             }}
-        />
-
-        <Image style={styles.imageStyle} source={{ uri: post?.imageURL }} />
-        <View style={styles.contentContainer}>
-          <Text style={styles.titleStyle}>{post?.title}</Text>
-          <Text style={[styles.textStyle, { paddingTop: 6 }]}>
-            {post?.description}
-          </Text>
-          <View style={styles.postDataContainer}>
-            <Text style={[styles.textStyle, { color: "grey" }]}>
-              {post?.hashtags}
-            </Text>
-            <Text
-                style={[
-                  styles.textStyle,
-                  { color: "gray", textDecorationLine: "underline" },
-                ]}
-            >
-              {post?.author}
-            </Text>
-          </View>
-          <View>
-            <Text>Kommentarer</Text>
-            <View>
-              {isLoadingComments ? (
-                  <ActivityIndicator />
-              ) : (
-                  postComments.map((comment) => {
-                    return (
-                        <View
-                            key={comment.id}
-                            style={{
-                              width: "100%",
-                              flexDirection: "row",
-                              justifyContent: "space-between",
+        >
+          <Stack.Screen
+              options={{
+                headerTitle: (props) => <Text>PostDetaljer</Text>,
+                headerRight: () => (
+                    post?.authorId === user?.uid && (
+                        <Pressable
+                            onPress={async () => {
+                              await postApi.deletePost(id as string, user?.uid ?? "");
+                              router.back();
                             }}
                         >
+                          <Text style={{color: "red"}}>Slett</Text>
+                        </Pressable>
+                    )
+                ),
+              }}
+          />
+
+          <Image style={styles.imageStyle} source={{uri: post?.imageURL}}/>
+          <View style={styles.contentContainer}>
+            <Text style={styles.titleStyle}>{post?.title}</Text>
+            <Text style={[styles.textStyle, {paddingTop: 6}]}>
+              {post?.description}
+            </Text>
+            <View style={styles.postDataContainer}>
+              <Text style={[styles.textStyle, {color: "grey"}]}>
+                {post?.hashtags}
+              </Text>
+              <Text
+                  style={[
+                    styles.textStyle,
+                    {color: "gray", textDecorationLine: "underline"},
+                  ]}
+              >
+                {post?.author}
+              </Text>
+            </View>
+            <View>
+              <Text>Kommentarer</Text>
+              <View>
+                {isLoadingComments ? (
+                    <ActivityIndicator/>
+                ) : (
+                    postComments.map((comment) => {
+                      return (
                           <View
                               key={comment.id}
                               style={{
+                                width: "100%",
                                 flexDirection: "row",
-                                gap: 4,
+                                justifyContent: "space-between",
                               }}
                           >
-                            <Text
+                            <View
+                                key={comment.id}
                                 style={{
-                                  color: "grey",
+                                  flexDirection: "row",
+                                  gap: 4,
                                 }}
                             >
-                              {comment.comment.authorName}:
-                            </Text>
-                            <Text>{comment.comment.comment}</Text>
-                          </View>
-                          {comment.comment.authorId === user?.uid && (
-                              <Pressable
-                                  onPress={() => {
-                                    commentApi.deleteComment(comment.id, post?.id ?? "");
-                                    setPostComments(
-                                        postComments.filter((c) => c.id !== comment.id)
-                                    );
-                                    visibleCommentIds.current =
-                                        visibleCommentIds.current.filter(
-                                            (id) => id !== comment.id
-                                        );
+                              <Text
+                                  style={{
+                                    color: "grey",
                                   }}
                               >
-                                <Text style={{ color: "red" }}>Slett</Text>
-                              </Pressable>
-                          )}
-                        </View>
-                    );
-                  })
-              )}
-            </View>
-            <View
-                style={{
-                  paddingTop: 16,
-                  flexDirection: "row",
-                  width: "100%",
-                }}
-            >
-              <TextInput
-                  value={commentText}
-                  onChangeText={setCommentText}
+                                {comment.comment.authorName}:
+                              </Text>
+                              <Text>{comment.comment.comment}</Text>
+                            </View>
+                            {comment.comment.authorId === user?.uid && (
+                                <Pressable
+                                    onPress={() => {
+                                      commentApi.deleteComment(comment.id, post?.id ?? "");
+                                      setPostComments(
+                                          postComments.filter((c) => c.id !== comment.id)
+                                      );
+                                      visibleCommentIds.current =
+                                          visibleCommentIds.current.filter(
+                                              (id) => id !== comment.id
+                                          );
+                                    }}
+                                >
+                                  <Text style={{color: "red"}}>Slett</Text>
+                                </Pressable>
+                            )}
+                          </View>
+                      );
+                    })
+                )}
+              </View>
+              <View
                   style={{
-                    borderBottomWidth: 1,
-                    borderColor: "gray",
+                    paddingTop: 16,
+                    flexDirection: "row",
                     width: "100%",
-                    marginTop: 2,
-                  }}
-              />
-              <Pressable
-                  style={{
-                    position: "absolute",
-                    right: 10,
-                    top: "70%",
-                  }}
-                  onPress={async () => {
-                    if (post && commentText !== "") {
-                      setIsLoadingAddComment(true);
-                      const newCOmment = await commentApi.addComment(post.id, {
-                        authorId: user?.uid ?? "Tull",
-                        comment: commentText,
-                        authorName: userNameSession ?? "Boogeyman",
-                      });
-                      if (newCOmment) {
-                        visibleCommentIds.current.push(newCOmment);
-                        await fetchComments(visibleCommentIds.current);
-                        setCommentText("");
-                        setIsLoadingAddComment(false);
-                      }
-                    }
                   }}
               >
-                {isLoadingAddComment ? (
-                    <ActivityIndicator />
-                ) : (
-                    <Text>Legg til</Text>
-                )}
-              </Pressable>
-            </View>
-          </View>
-          {post && (
-              <View style={styles.mapContainer}>
-                <Text style={[styles.textStyle, { color: "grey" }]}>
-                  {`Sted: ${postLocation}`}
-                </Text>
-                <MapView
-                    zoomEnabled={false}
-                    scrollEnabled={false}
-                    rotateEnabled={false}
-                    pitchEnabled={false}
-                    initialRegion={{
-                      latitude: post?.postCoordinates?.latitude ?? 0,
-                      longitude: post?.postCoordinates?.longitude ?? 0,
-                      latitudeDelta: 0.0082,
-                      longitudeDelta: 0.0081,
+                <TextInput
+                    value={commentText}
+                    onChangeText={setCommentText}
+                    style={{
+                      borderBottomWidth: 1,
+                      borderColor: "gray",
+                      width: "100%",
+                      marginTop: 2,
                     }}
-                    style={styles.mapStyle}
+                />
+                <Pressable
+                    style={{
+                      position: "absolute",
+                      right: 10,
+                      top: "70%",
+                    }}
+                    onPress={async () => {
+                      if (post && commentText !== "") {
+                        setIsLoadingAddComment(true);
+                        const newComment = await commentApi.addComment(post.id, {
+                          authorId: user?.uid ?? "Tull",
+                          comment: commentText,
+                          authorName: userNameSession ?? "Boogeyman",
+                        });
+                        if (newComment) {
+                          visibleCommentIds.current.push(newComment);
+                          await fetchComments(visibleCommentIds.current);
+                          setCommentText("");
+                          setIsLoadingAddComment(false);
+                        }
+                      }
+                    }}
                 >
-                  <Marker
-                      coordinate={{
+                  {isLoadingAddComment ? (
+                      <ActivityIndicator/>
+                  ) : (
+                      <Text>Legg til</Text>
+                  )}
+                </Pressable>
+              </View>
+            </View>
+            {post && (
+                <View style={styles.mapContainer}>
+                  <Text style={[styles.textStyle, {color: "grey"}]}>
+                    {`Sted: ${postLocation}`}
+                  </Text>
+                  <MapView
+                      zoomEnabled={false}
+                      scrollEnabled={false}
+                      rotateEnabled={false}
+                      pitchEnabled={false}
+                      initialRegion={{
                         latitude: post?.postCoordinates?.latitude ?? 0,
                         longitude: post?.postCoordinates?.longitude ?? 0,
+                        latitudeDelta: 0.0082,
+                        longitudeDelta: 0.0081,
                       }}
-                  />
-                </MapView>
-              </View>
-          )}
+                      style={styles.mapStyle}
+                  >
+                    <Marker
+                        coordinate={{
+                          latitude: post?.postCoordinates?.latitude ?? 0,
+                          longitude: post?.postCoordinates?.longitude ?? 0,
+                        }}
+                    />
+                  </MapView>
+                </View>
+            )}
+          </View>
         </View>
-      </View>
-  );
-}
+    );
+  }
 
 const styles = StyleSheet.create({
   imageStyle: {

@@ -6,6 +6,7 @@ export interface PostData {
   id: string;
   hashtags: string;
   author: string;
+  authorId: string;
   isLiked: boolean;
   likes: string[];
   imageURL: string;

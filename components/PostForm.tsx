@@ -16,6 +16,7 @@ import SelectImageModal from "./SelectImageModal";
 import * as Location from "expo-location";
 import * as postApi from "@/api/postApi";
 import { useAuthSession } from "@/providers/authctx";
+import { LocationObjectCoords } from "expo-location";
 
 type PostFormProps = {
   addNewPost: (newPost?: PostData) => void;
@@ -29,7 +30,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
   const [image, setImage] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
 
-  const { userNameSession } = useAuthSession();
+  const { userNameSession, user } = useAuthSession();
 
   const [statusText, setStatusText] = useState<string | null>(null);
   const [location, setLocation] = useState<Location.LocationGeocodedAddress | null>(null);
@@ -149,6 +150,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
                       id: `postName-${titleText}`,
                       hashtags: hashtagText,
                       author: userNameSession || "Anonym",
+                      authorId: user?.uid || "unknown",
                       isLiked: false,
                       imageURL: image || "",
                       postCoordinates: postCoordinatesData.current,

@@ -21,7 +21,6 @@ import { uploadImageToFirebase } from "./imageApi";
 export const createPost = async (post: PostData) => {
   try {
     const firebaseImage = await uploadImageToFirebase(post.imageURL);
-    console.log("firebaseImage", firebaseImage);
     if (firebaseImage === "ERROR") {
       return;
     }
@@ -29,6 +28,7 @@ export const createPost = async (post: PostData) => {
     const postWithImageData: PostData = {
       ...post,
       imageURL: postImageDownloadUrl,
+      authorId: post.authorId, // Ensure authorId is included
     };
     const docRef = await addDoc(collection(db, "posts"), postWithImageData);
     console.log("Document written with ID:", docRef.id);
@@ -36,7 +36,6 @@ export const createPost = async (post: PostData) => {
     console.log("Error adding document", e);
   }
 };
-
 export const getAllPosts = async () => {
   const queryResult = await getDocs(collection(db, "posts"));
   return queryResult.docs.map((doc) => {
@@ -88,15 +87,20 @@ export const getPostById = async (id: string) => {
   } as PostData;
 };
 
-export const deletePost = async (id: string) => {
+export const deletePost = async (id: string, userId: string) => {
   try {
-    await deleteDoc(doc(db, "posts", id));
-    console.log("Document successfully deleted!");
+    const postRef = doc(db, "posts", id);
+    const post = await getDoc(postRef);
+    if (post.exists() && post.data()?.authorId === userId) {
+      await deleteDoc(postRef);
+      console.log("Document successfully deleted!");
+    } else {
+      console.error("Error: User is not authorized to delete this post");
+    }
   } catch (e) {
     console.error("Error removing document: ", e);
   }
 };
-
 export const toggleLikePost = async (id: string, userId: string) => {
   const postRef = doc(db, "posts", id);
   const post = await getDoc(postRef);

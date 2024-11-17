@@ -15,12 +15,12 @@ export default function ProfilePage() {
         <View style={{ paddingTop: 20 }}>
           {user ? (
               <Pressable
-                  className="bg-red-500"
+                  style={styles.logoutButton}
                   onPress={async () => {
                     signOut();
                   }}
               >
-                <Text className="italic font-bold">Logg ut</Text>
+                <Text style={styles.logoutButtonText}>Logg ut</Text>
               </Pressable>
           ) : (
               <Link asChild href={{ pathname: "/authentication" }}>
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 4,
     backgroundColor: "#0096C7",
+    maxWidth: 20,
   },
   alertButton: {
     paddingHorizontal: 12,
@@ -49,7 +50,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#D9021D",
   },
+  logoutButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 4,
+    backgroundColor: "red",
+    maxWidth: 100,
+    margin:  10 ,
+  },
+  logoutButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   textStyle: {
     fontSize: 20,
+    marginLeft: 10,
+    marginTop: 10,
   },
 });
