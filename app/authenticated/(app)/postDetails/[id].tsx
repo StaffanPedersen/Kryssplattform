@@ -1,4 +1,3 @@
-import { getPostById } from "@/utils/dummyPostData";
 import { getPostFromLocalById } from "@/utils/local_storage";
 import { CommentObject, PostData } from "@/utils/postData";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -54,7 +53,7 @@ export default function postDetails() {
     const backendPost = await postApi.getPostById(id as string);
     if (backendPost) {
       setPost(backendPost);
-      fetchComments(backendPost.comments);
+      await fetchComments(backendPost.comments);
       visibleCommentIds.current = backendPost.comments;
       const location = await Location.reverseGeocodeAsync({
         latitude: backendPost.postCoordinates?.latitude ?? 0,

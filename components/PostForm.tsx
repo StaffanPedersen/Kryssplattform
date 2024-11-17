@@ -18,7 +18,7 @@ import * as postApi from "@/api/postApi";
 import { useAuthSession } from "@/providers/authctx";
 
 type PostFormProps = {
-  addNewPost: () => void;
+  addNewPost: (newPost?: PostData) => void;
   closeModal: () => void;
 };
 
@@ -32,149 +32,152 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
   const { userNameSession } = useAuthSession();
 
   const [statusText, setStatusText] = useState<string | null>(null);
-  const [location, setLocation] =
-    useState<Location.LocationGeocodedAddress | null>(null);
+  const [location, setLocation] = useState<Location.LocationGeocodedAddress | null>(null);
 
-  const postCoordinatesData = useRef<Location.LocationObjectCoords | null>(
-    null
-  );
+  const postCoordinatesData = useRef<Location.LocationObjectCoords | null>(null);
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setStatusText("Tillatelse til å bruke lokasjon ble ikke gitt");
+        setStatusText("Permission to access location was denied");
         return;
       }
+      setStatusText(null); // Clear any previous status text
     })();
   }, []);
 
   const getLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      setStatusText("Tillatelse til å bruke lokasjon ble ikke gitt");
+      setStatusText("Permission to access location was denied");
+      setLocation(null);
+      postCoordinatesData.current = null;
       return;
     }
 
-    let location = await Location.getCurrentPositionAsync();
-    postCoordinatesData.current = location.coords;
-    const locationAddress = await Location.reverseGeocodeAsync({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    });
-    setLocation(locationAddress[0]);
+    try {
+      const location = await Location.getCurrentPositionAsync();
+      postCoordinatesData.current = location.coords;
+      const locationAddress = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+      setLocation(locationAddress[0]);
+    } catch (error) {
+      setStatusText("Failed to get location");
+      setLocation(null);
+      postCoordinatesData.current = null;
+    }
   };
 
-  let text = "Dette blir en kul geolokasjon wow!";
+  let text = "Fetching location...";
   if (statusText) {
     text = statusText;
   } else if (location) {
-    text = JSON.stringify(location);
+    text = `${location.street ?? ""} ${location.streetNumber ?? ""} - ${location.city ?? ""}, ${location.country ?? ""}`;
   }
 
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView
-        keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
-      >
-        <View style={styles.contentContainer}>
-          <Modal visible={isCameraOpen} animationType="slide">
-            <SelectImageModal
-              closeModal={() => {
-                setIsCameraOpen(false);
-                getLocation();
-              }}
-              setImage={setImage}
-            />
-          </Modal>
-          <Pressable
-            onPress={() => setIsCameraOpen(true)}
-            style={styles.addImageBox}
-          >
-            {image ? (
-              <Image
-                source={{ uri: image }}
-                style={{ resizeMode: "cover", width: "100%", height: 300 }}
-                alt="Hmmmmm"
+      <View style={styles.mainContainer}>
+        <ScrollView
+            keyboardDismissMode="interactive"
+            automaticallyAdjustKeyboardInsets
+        >
+          <View style={styles.contentContainer}>
+            <Modal visible={isCameraOpen} animationType="slide">
+              <SelectImageModal
+                  closeModal={() => {
+                    setIsCameraOpen(false);
+                    getLocation();
+                  }}
+                  setImage={setImage}
               />
-            ) : (
-              <EvilIcons name="image" size={80} color="gray" />
-            )}
-          </Pressable>
-          <Text>{`${location?.street} ${location?.streetNumber} - ${location?.city}, ${location?.country}`}</Text>
-          <View style={styles.textFieldContainer}>
-            <Text style={styles.text}>Tittel</Text>
-            <TextInput
-              onChangeText={setTitleText}
-              value={titleText}
-              style={styles.textfield}
-              placeholder="Skriv inn tittel"
-            />
-          </View>
-          <View style={styles.textFieldContainer}>
-            <Text style={styles.text}>Beskrivelse</Text>
-            <TextInput
-              multiline
-              numberOfLines={3}
-              onChangeText={setDescriptionText}
-              value={descriptionText}
-              style={[styles.textfield, { height: 84 }]}
-              placeholder="Skriv inn beskrivelse"
-            />
-          </View>
-          <View style={styles.textFieldContainer}>
-            <Text style={styles.text}>Hashtags</Text>
-            <TextInput
-              onChangeText={setHashtagText}
-              value={hashtagText}
-              style={styles.textfield}
-              placeholder="#kultur #natur #mat"
-            />
-          </View>
-          <View style={styles.buttonContainer}>
+            </Modal>
             <Pressable
-              style={styles.primaryButton}
-              onPress={async () => {
-                const newPost: PostData = {
-                  title: titleText,
-                  description: descriptionText,
-                  // midler for å generere en ikke fullt så unik id, hvis to poster har samme tittel vil det dukke opp en warning om children with the same key
-                  // Dette løser seg selv når vi kan få unike IDer fra en backend
-                  id: `postName-${titleText}`,
-                  hashtags: hashtagText,
-                  author: userNameSession || "Anonym",
-                  isLiked: false,
-                  imageURL: image || "",
-                  postCoordinates: postCoordinatesData.current,
-                  comments: [],
-                };
+                onPress={() => setIsCameraOpen(true)}
+                style={styles.addImageBox}
+                accessibilityLabel="Add or change image"
+            >
+              {image ? (
+                  <Image
+                      source={{ uri: image }}
+                      style={{ resizeMode: "cover", width: "100%", height: 300 }}
+                      alt="Selected image"
+                  />
+              ) : (
+                  <EvilIcons name="image" size={80} color="gray" />
+              )}
+            </Pressable>
+            <Text>{text}</Text>
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.text}>Tittel</Text>
+              <TextInput
+                  onChangeText={setTitleText}
+                  value={titleText}
+                  style={styles.textfield}
+                  placeholder="Skriv inn tittel"
+              />
+            </View>
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.text}>Beskrivelse</Text>
+              <TextInput
+                  multiline
+                  numberOfLines={3}
+                  onChangeText={setDescriptionText}
+                  value={descriptionText}
+                  style={[styles.textfield, { height: 84 }]}
+                  placeholder="Skriv inn beskrivelse"
+              />
+            </View>
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.text}>Hashtags</Text>
+              <TextInput
+                  onChangeText={setHashtagText}
+                  value={hashtagText}
+                  style={styles.textfield}
+                  placeholder="#kultur #natur #mat"
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                  style={styles.primaryButton}
+                  onPress={async () => {
+                    const newPost: PostData = {
+                      title: titleText,
+                      description: descriptionText,
+                      id: `postName-${titleText}`,
+                      hashtags: hashtagText,
+                      author: userNameSession || "Anonym",
+                      isLiked: false,
+                      imageURL: image || "",
+                      postCoordinates: postCoordinatesData.current,
+                      comments: [],
+                      likes: [],
+                    };
 
-                await postApi.createPost(newPost);
-                addNewPost();
-                setTitleText("");
-                setDescriptionText("");
-                setHashtagText("");
-              }}
-            >
-              <Text style={{ color: "white" }}>Legg til post</Text>
-            </Pressable>
-            <Pressable
-              style={styles.secondaryButton}
-              onPress={() => closeModal()}
-            >
-              <Text
-                style={{
-                  color: "#412E25",
-                }}
+                    await postApi.createPost(newPost);
+                    addNewPost(newPost);
+                    setTitleText("");
+                    setDescriptionText("");
+                    setHashtagText("");
+                    setImage(null); // Clear image after posting
+                  }}
+                  accessibilityLabel="Add post"
               >
-                Avbryt
-              </Text>
-            </Pressable>
+                <Text style={{ color: "white" }}>Legg til post</Text>
+              </Pressable>
+              <Pressable
+                  style={styles.secondaryButton}
+                  onPress={closeModal}
+                  accessibilityLabel="Cancel and close form"
+              >
+                <Text style={{ color: "#412E25" }}>Avbryt</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
   );
 }
 
@@ -203,12 +206,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
   },
-  text: {},
+  text: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   textfield: {
     borderWidth: 1,
     padding: 10,
     marginTop: 2,
     borderRadius: 5,
+    fontSize: 14,
   },
   buttonContainer: {
     flexDirection: "row",

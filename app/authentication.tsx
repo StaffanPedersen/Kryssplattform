@@ -9,110 +9,113 @@ const Authentication = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [isSignUp, setIsSignUp] = useState(false);
 
   const { signIn } = useAuthSession();
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <View style={styles.mainContainer}>
-        {isSignUp && (
+      <View style={styles.container}>
+        <View style={styles.mainContainer}>
+          {isSignUp && (
+              <View style={styles.textFieldContainer}>
+                <Text>Brukernavn</Text>
+                <TextInput
+                    value={userName}
+                    onChangeText={setUserName}
+                    style={styles.textField}
+                    placeholder="Brukernavn"
+                />
+              </View>
+          )}
           <View style={styles.textFieldContainer}>
-            <Text>Brukernavn</Text>
+            <Text>Epost</Text>
             <TextInput
-              value={userName}
-              onChangeText={setUserName}
-              style={styles.textField}
-              placeholder="Brukernavn"
+                value={userEmail}
+                onChangeText={setUserEmail}
+                style={styles.textField}
+                placeholder="Epost"
             />
           </View>
-        )}
-        <View style={styles.textFieldContainer}>
-          <Text>Epost</Text>
-          <TextInput
-            value={userEmail}
-            onChangeText={setUserEmail}
-            style={styles.textField}
-            placeholder="Epost"
-          />
-        </View>
-        <View style={styles.textFieldContainer}>
-          <Text>Passord</Text>
-          <TextInput
-            value={password}
-            secureTextEntry={true}
-            onChangeText={setPassword}
-            style={styles.textField}
-            placeholder="Passord"
-          />
-        </View>
-        {!isSignUp && (
-          <Pressable
-            style={{
-              paddingTop: 24,
-            }}
-            onPress={() => {
-              setIsSignUp(true);
-            }}
-          >
-            <Text
-              style={{
-                textDecorationLine: "underline",
-              }}
-            >
-              Lag bruker
-            </Text>
-          </Pressable>
-        )}
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => {
-              if (isSignUp) {
-                authApi.signUp(userEmail, password, userName);
-              } else {
-                signIn(userEmail, password);
-              }
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-              }}
-            >
-              {isSignUp ? "Lag bruker" : "Logg inn"}
-            </Text>
-          </Pressable>
-          {isSignUp && (
-            <Pressable
-              style={styles.secondaryButton}
-              onPress={() => setIsSignUp(false)}
-            >
-              <Text>Avbryt</Text>
-            </Pressable>
+          <View style={styles.textFieldContainer}>
+            <Text>Passord</Text>
+            <TextInput
+                value={password}
+                secureTextEntry={true}
+                onChangeText={setPassword}
+                style={styles.textField}
+                placeholder="Passord"
+            />
+          </View>
+          {!isSignUp && (
+              <Pressable
+                  style={styles.signUpLink}
+                  onPress={() => setIsSignUp(true)}
+              >
+                <Text style={styles.underlineText}>Lag bruker</Text>
+              </Pressable>
           )}
+          <View style={styles.buttonContainer}>
+            <Pressable
+                style={styles.primaryButton}
+                onPress={() => {
+                  console.log("Button pressed. isSignUp:", isSignUp);
+                  if (isSignUp) {
+                    authApi.signUp(userEmail, password, userName);
+                  } else {
+                    console.log("Attempting to sign in with email:", userEmail, "and password:", password);
+                    signIn(userEmail, password);
+                  }
+                }}
+            >
+              <Text style={styles.buttonText}>
+                {isSignUp ? "Lag bruker" : "Logg inn"}
+              </Text>
+            </Pressable>
+            {isSignUp && (
+                <Pressable
+                    style={styles.secondaryButton}
+                    onPress={() => setIsSignUp(false)}
+                >
+                  <Text>Avbryt</Text>
+                </Pressable>
+            )}
+          </View>
         </View>
       </View>
-    </View>
   );
 };
 
 export default Authentication;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   mainContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
     width: "100%",
+  },
+  textFieldContainer: {
+    width: "100%",
+    paddingTop: 16,
+  },
+  textField: {
+    borderWidth: 1,
+    padding: 10,
+    marginTop: 2,
+    borderColor: "gray",
+    borderRadius: 5,
+  },
+  signUpLink: {
+    paddingTop: 24,
+  },
+  underlineText: {
+    textDecorationLine: "underline",
   },
   buttonContainer: {
     width: "100%",
@@ -134,15 +137,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
   },
-  textFieldContainer: {
-    width: "100%",
-    paddingTop: 16,
-  },
-  textField: {
-    borderWidth: 1,
-    padding: 10,
-    marginTop: 2,
-    borderColor: "gray",
-    borderRadius: 5,
+  buttonText: {
+    color: "white",
   },
 });

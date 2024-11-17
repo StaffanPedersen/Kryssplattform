@@ -14,7 +14,7 @@ import { Stack } from "expo-router";
 import { getData, getItemWithSetter, storeData } from "@/utils/local_storage";
 import PostForm from "@/components/PostForm";
 import UpsertUser from "@/components/UpsertUser";
-import { addNewPost, getAllPosts, toggleLike } from "@/utils/dummyPostData";
+
 import { PostData } from "@/utils/postData";
 import Post from "@/components/Post";
 import Spacer from "@/components/Spacer";

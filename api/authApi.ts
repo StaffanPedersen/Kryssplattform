@@ -5,14 +5,15 @@ import {
   updateProfile,
 } from "firebase/auth";
 
-export const signIn = async (email: string, password: string) => {
-  await signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log("User signed in", userCredential);
-    })
-    .catch((error) => {
-      console.log("Oops, kunne ikke logge inn", error);
-    });
+export const signIn = async (email: string, password: string): Promise<string | null> => {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("User signed in", userCredential);
+        return null; // No error
+    } catch (error: any) {
+        console.log("Oops, kunne ikke logge inn", error);
+        return error.message; // Return the error message
+    }
 };
 
 export const signOut = async () => {

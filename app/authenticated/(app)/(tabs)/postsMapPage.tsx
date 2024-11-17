@@ -47,7 +47,7 @@ export default function postsMapPage() {
                 <Pressable
                   onPress={() => {
                     router.navigate({
-                      pathname: "/postDetails/[id]",
+                      pathname: "/authenticated/postDetails/[id]",
                       params: { id: post.id },
                     });
                   }}

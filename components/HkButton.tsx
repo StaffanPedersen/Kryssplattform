@@ -9,12 +9,12 @@ type HkButtonProps = {
 };
 
 export default function HkButton({
-  onPress,
-  title,
-  theme = "primary",
-  bold = false,
-  italic = false,
-}: HkButtonProps) {
+                                   onPress,
+                                   title,
+                                   theme = "primary",
+                                   bold = false,
+                                   italic = false,
+                                 }: HkButtonProps) {
   const buttonClassNames: string[] = [];
   const textClassNames: string[] = ["text-md"];
 
@@ -31,8 +31,8 @@ export default function HkButton({
   }
 
   return (
-    <Pressable className={buttonClassNames.join(" ")}>
-      <Text className={textClassNames.join(" ")}>{title}</Text>
-    </Pressable>
+      <Pressable className={buttonClassNames.join(" ")} onPress={onPress}>
+        <Text className={textClassNames.join(" ")}>{title}</Text>
+      </Pressable>
   );
 }
