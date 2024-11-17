@@ -7,7 +7,7 @@ import { useAuthSession } from "../providers/authctx";
 import { useRouter } from "expo-router";
 import HkButton from "../components/HkButton";
 
-const WelcomePage = () => {
+const Index = () => {
     const { user } = useAuthSession();
     const router = useRouter();
     const [posts, setPosts] = useState<PostData[]>([]);
@@ -55,7 +55,7 @@ const WelcomePage = () => {
                     title="Login"
                     onPress={() => {
                         console.log("Navigating to authentication page");
-                        router.push("/authenticated");
+                        router.push("/authentication");
                     }}
                     theme="primary"
                 />
@@ -71,4 +71,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default WelcomePage;
+export default Index;

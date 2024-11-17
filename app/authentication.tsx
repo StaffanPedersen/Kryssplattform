@@ -1,9 +1,10 @@
 import { useAuthSession } from "@/providers/authctx";
 import { storeData } from "@/utils/local_storage";
-import { useRouter } from "expo-router";
+import {router, useRouter} from "expo-router";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable } from "react-native";
 import * as authApi from "@/api/authApi";
+import {async} from "@firebase/util";
 
 const Authentication = () => {
   const [userName, setUserName] = useState("");
@@ -12,6 +13,27 @@ const Authentication = () => {
   const [isSignUp, setIsSignUp] = useState(false);
 
   const { signIn } = useAuthSession();
+
+  const handleSignIn = async () => {
+    try {
+        await authApi.signIn(userEmail, password);
+        router.navigate("/authenticated/(app)/(tabs)");
+    } catch (error) {
+        console.log("Error signing in:", error);
+    }
+  }
+
+  const handleSignUp = async () => {
+    try {
+      console.log("Attempting to sign up with email:", userEmail, "password:", password, "username:", userName);
+      const response = await authApi.signUp(userEmail, password, userName);
+      console.log("Sign-up response:", response);
+      router.replace("/authenticated/(app)/(tabs)");
+      console.log("Router replace called");
+    } catch (error) {
+      console.log("Error signing up:", error);
+    }
+  };
 
   return (
       <View style={styles.container}>
@@ -60,10 +82,12 @@ const Authentication = () => {
                 onPress={() => {
                   console.log("Button pressed. isSignUp:", isSignUp);
                   if (isSignUp) {
-                    authApi.signUp(userEmail, password, userName);
+                  //  authApi.signUp(userEmail, password, userName);
+                    handleSignUp( ).then(r => router.push("/authenticated/(app)/(tabs)"));
                   } else {
                     console.log("Attempting to sign in with email:", userEmail, "and password:", password);
-                    signIn(userEmail, password);
+                    //signIn(userEmail, password);
+                    handleSignIn().then(r => console.log("handleSignIn", r));
                   }
                 }}
             >

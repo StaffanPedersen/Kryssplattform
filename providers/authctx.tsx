@@ -64,28 +64,14 @@ export function rAuthSessionProvider({ children }: { children: ReactNode }) {
       <AuthContext.Provider
           value={{
             signIn: async (userName: string, password: string) => {
-              try {
-                const errorMessage = await authApi.signIn(userName, password);
-                if (!errorMessage) {
-                  const user = auth.currentUser;
-                  if (user) {
-                    setUserSession(user.displayName);
-                    setUserAuthSession(user);
-                    router.replace("/authenticated/(app)/(tabs)");
-                  }
-                } else {
-                  console.log("Error signing in:", errorMessage);
-                  return errorMessage;
-                }
-              } catch (error) {
-                console.error("Unexpected error during sign-in:", error);
-                return "An unexpected error occurred during sign-in.";
-              }
+              await authApi.signIn(userName, password);
+              // setUserSession(userName);
+              // storeData("authSession", userName);
             },
             signOut: async () => {
               await authApi.signOut();
-              setUserSession(null);
-              setUserAuthSession(null);
+              // setUserSession(null);
+              // deleteData("authSession");
             },
             userNameSession: userSession,
             user: userAuthSession,
