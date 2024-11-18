@@ -39,7 +39,6 @@ export const createPost = async (post: PostData) => {
 export const getAllPosts = async () => {
   const queryResult = await getDocs(collection(db, "posts"));
   return queryResult.docs.map((doc) => {
-    console.log(doc.data());
     return { ...doc.data(), id: doc.id } as PostData;
   });
 };

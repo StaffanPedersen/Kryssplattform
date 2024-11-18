@@ -17,6 +17,7 @@ import * as Location from "expo-location";
 import * as postApi from "@/api/postApi";
 import { useAuthSession } from "@/providers/authctx";
 import { LocationObjectCoords } from "expo-location";
+import {uuidv4} from "@firebase/util";
 
 type PostFormProps = {
   addNewPost: (newPost?: PostData) => void;
@@ -145,9 +146,9 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
                   style={styles.primaryButton}
                   onPress={async () => {
                     const newPost: PostData = {
+                      id: uuidv4(),
                       title: titleText,
                       description: descriptionText,
-                      id: `postName-${titleText}`,
                       hashtags: hashtagText,
                       author: userNameSession || "Anonym",
                       authorId: user?.uid || "unknown",

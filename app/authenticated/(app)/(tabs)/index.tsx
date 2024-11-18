@@ -124,7 +124,6 @@ export default function Index() {
                     paddingHorizontal: 20,
                 }}
                 data={posts}
-                keyExtractor={(item) => item.id} // Ensure unique keys
                 ListHeaderComponent={() => <Spacer height={10} />}
                 ListFooterComponent={() => <Spacer height={50} />}
                 ItemSeparatorComponent={() => <Spacer height={8} />}
@@ -144,9 +143,12 @@ export default function Index() {
                                 }
                                 return tempPost;
                             });
+                            setPosts(tempPosts);
+                            storeData("posts", JSON.stringify(tempPosts));
                         }}
                     />
                 )}
+                keyExtractor={(item) => item.id} // Ensure unique keys
             />
         </View>
     );
