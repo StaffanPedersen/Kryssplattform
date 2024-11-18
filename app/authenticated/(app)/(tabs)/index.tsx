@@ -7,13 +7,15 @@ import {
     Modal,
     RefreshControl,
     TextInput,
+    ActivityIndicator,
 } from "react-native";
 
 import { useEffect, useRef, useState } from "react";
 import { Stack } from "expo-router";
-import { getData, getItemWithSetter, storeData } from "@/utils/local_storage";
+import { getData, storeData } from "@/utils/local_storage";
 import PostForm from "@/components/PostForm";
 import UpsertUser from "@/components/UpsertUser";
+import '../../../../global.css';
 
 import { PostData } from "@/utils/postData";
 import Post from "@/components/Post";
@@ -29,13 +31,11 @@ export default function Index() {
     const [refreshing, setRefreshing] = useState(false);
     const [isDescending, setIsDescending] = useState(true);
     const [searchString, setSearchString] = useState("");
+    const [loadingMore, setLoadingMore] = useState(false);
 
     const { userNameSession, signOut } = useAuthSession();
 
-    const lastDocRef = useRef<QueryDocumentSnapshot<
-        DocumentData,
-        DocumentData
-    > | null>(null);
+    const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData, DocumentData> | null>(null);
 
     const getPostsFromLocal = async () => {
         const posts = await getData("posts");
@@ -44,7 +44,7 @@ export default function Index() {
         }
     };
 
-    const getPostsFromBackend = async () => {
+    const getPostsFromBackend = async (isLoadMore = false) => {
         setRefreshing(true);
         const { result: newPosts, last: lastDoc } = await postApi.getPaginatedPosts(
             lastDocRef.current
@@ -55,7 +55,11 @@ export default function Index() {
     };
 
     useEffect(() => {
-        getPostsFromBackend();
+        const loadPosts = async () => {
+            await getPostsFromLocal();
+            await getPostsFromBackend();
+        };
+        loadPosts();
     }, []);
 
     return (
@@ -125,7 +129,9 @@ export default function Index() {
                 }}
                 data={posts}
                 ListHeaderComponent={() => <Spacer height={10} />}
-                ListFooterComponent={() => <Spacer height={50} />}
+                ListFooterComponent={() => (
+                    loadingMore ? <ActivityIndicator size="large" color="#0000ff" /> : <Spacer height={50} />
+                )}
                 ItemSeparatorComponent={() => <Spacer height={8} />}
                 refreshControl={
                     <RefreshControl
@@ -133,6 +139,8 @@ export default function Index() {
                         onRefresh={getPostsFromBackend}
                     />
                 }
+                onEndReached={() => getPostsFromBackend(true)}
+                onEndReachedThreshold={0.5}
                 renderItem={({ item }) => (
                     <Post
                         postData={item}
@@ -179,5 +187,10 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         position: "absolute",
+    },
+    container_web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        paddingHorizontal: 20,
     },
 });

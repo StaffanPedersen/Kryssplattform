@@ -44,14 +44,14 @@ export const getAllPosts = async () => {
 };
 
 export const getPaginatedPosts = async (
-  getFromDoc: QueryDocumentSnapshot<DocumentData, DocumentData> | null
+    getFromDoc: QueryDocumentSnapshot<DocumentData, DocumentData> | null
 ) => {
   if (getFromDoc) {
     const next = query(
-      collection(db, "posts"),
-      orderBy("title", "desc"),
-      startAfter(getFromDoc),
-      limit(2)
+        collection(db, "posts"),
+        orderBy("title", "desc"),
+        startAfter(getFromDoc),
+        limit(10) // Set an appropriate limit
     );
     const querySnapshots = await getDocs(next);
 
@@ -63,9 +63,9 @@ export const getPaginatedPosts = async (
     return { result, last };
   }
   const first = query(
-    collection(db, "posts"),
-    orderBy("title", "desc"),
-    limit(2)
+      collection(db, "posts"),
+      orderBy("title", "desc"),
+      limit(10) // Set an appropriate limit
   );
   const querySnapshots = await getDocs(first);
 
@@ -76,7 +76,6 @@ export const getPaginatedPosts = async (
   });
   return { result, last };
 };
-
 export const getPostById = async (id: string) => {
   const specificPost = await getDoc(doc(db, "posts", id));
   console.log("post by spesific id", specificPost.data());

@@ -6,6 +6,8 @@ import { PostData } from "../utils/postData";
 import { useAuthSession } from "../providers/authctx";
 import { useRouter } from "expo-router";
 import HkButton from "../components/HkButton";
+import '../global.css';
+import { getData, storeData } from "@/utils/local_storage";
 
 const Index = () => {
     const { user } = useAuthSession();
@@ -22,8 +24,17 @@ const Index = () => {
     const fetchPosts = async () => {
         setRefreshing(true);
         const fetchedPosts = await getAllPosts();
-        setPosts(fetchedPosts);
+        const localPosts = await getData("posts");
+        const parsedLocalPosts: PostData[] = localPosts ? JSON.parse(localPosts) : [];
+
+        const allPosts = [...fetchedPosts, ...parsedLocalPosts];
+        const uniquePosts = Array.from(new Set(allPosts.map(post => post.id)))
+            .map(id => allPosts.find(post => post.id === id))
+            .filter((post): post is PostData => post !== undefined);
+
+        setPosts(uniquePosts);
         setRefreshing(false);
+        storeData("posts", JSON.stringify(uniquePosts));
     };
 
     useEffect(() => {
@@ -68,6 +79,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
+    },
+
+    container_web: {
+        maxWidth: 1200,
+        alignSelf: 'center',
+        paddingHorizontal: 20,
     },
 });
 
