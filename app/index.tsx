@@ -42,7 +42,7 @@ const Index = () => {
         <View style={styles.container}>
             <FlatList
                 data={posts}
-                keyExtractor={(item: PostData) => item.id.toString()}
+                keyExtractor={(item: PostData) => item.id} // Ensure unique keys
                 renderItem={({ item }) => (
                     <Post postData={item} toggleLike={toggleLike} disabled={!user} />
                 )}
