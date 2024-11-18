@@ -51,7 +51,7 @@ export const getPaginatedPosts = async (
         collection(db, "posts"),
         orderBy("title", "desc"),
         startAfter(getFromDoc),
-        limit(10) // Set an appropriate limit
+       // limit(10) // Set an appropriate limit
     );
     const querySnapshots = await getDocs(next);
 

@@ -30,7 +30,7 @@ const TabsLayout = () => {
                                 color: "black",
                             }}
                         >
-                            Hjemmeside
+                            Hovedside
                         </Text>
                     ),
                     headerStyle: {
@@ -77,7 +77,7 @@ const TabsLayout = () => {
                                 color: "black",
                             }}
                         >
-                            Profilside
+                            Din profil
                         </Text>
                     ),
                 }}
