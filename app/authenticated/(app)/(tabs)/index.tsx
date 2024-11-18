@@ -50,7 +50,14 @@ export default function Index() {
             lastDocRef.current
         );
         lastDocRef.current = lastDoc;
-        setPosts([...posts, ...newPosts]);
+
+        const combinedPosts = [...posts, ...newPosts];
+
+        const uniquePosts = Array.from(new Set(combinedPosts.map(post => post.id)))
+            .map(id => combinedPosts.find(post => post.id === id))
+            .filter((post): post is PostData => post !== undefined);
+
+        setPosts(uniquePosts);
         setRefreshing(false);
     };
 
@@ -61,6 +68,17 @@ export default function Index() {
         };
         loadPosts();
     }, []);
+
+    const filterPosts = (posts: PostData[], searchString: string) => {
+        if (!searchString) return posts;
+        return posts.filter(post =>
+                post.title.toLowerCase().includes(searchString.toLowerCase())
+            // Ensure 'content' is a valid property or remove this line
+            // post.content.toLowerCase().includes(searchString.toLowerCase())
+        );
+    };
+
+    const filteredPosts = filterPosts(posts, searchString);
 
     return (
         <View style={styles.titleContainer}>
@@ -127,7 +145,7 @@ export default function Index() {
                     width: "100%",
                     paddingHorizontal: 20,
                 }}
-                data={posts}
+                data={filteredPosts}
                 ListHeaderComponent={() => <Spacer height={10} />}
                 ListFooterComponent={() => (
                     loadingMore ? <ActivityIndicator size="large" color="#0000ff" /> : <Spacer height={50} />
