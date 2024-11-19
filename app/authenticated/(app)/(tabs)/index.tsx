@@ -29,7 +29,6 @@ export default function Index() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUpsertUserModalOpen, setIsUpsertUserModalOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [isDescending, setIsDescending] = useState(true);
     const [searchString, setSearchString] = useState("");
     const [loadingMore, setLoadingMore] = useState(false);
 
@@ -90,16 +89,6 @@ export default function Index() {
                             onPress={() => setIsModalOpen(true)}
                         >
                             <Text>Nytt innlegg</Text>
-                        </Pressable>
-                    ),
-                    headerLeft: () => (
-                        <Pressable
-                            style={{ paddingLeft: 6 }}
-                            onPress={async () => {
-                                setIsDescending(!isDescending);
-                            }}
-                        >
-                            <Text>{isDescending ? "A-Å" : "Å-A"}</Text>
                         </Pressable>
                     ),
                 }}
@@ -174,7 +163,7 @@ export default function Index() {
                         }}
                     />
                 )}
-                keyExtractor={(item) => item.id} // Ensure unique keys
+                keyExtractor={(item) => item.id}
             />
         </View>
     );

@@ -16,7 +16,7 @@ const Authentication = () => {
   const handleSignIn = async () => {
     try {
       await authApi.signIn(userEmail, password);
-      router.navigate("/authenticated/(app)/(tabs)");
+      router.navigate("./(app)/(tabs)");
     } catch (error) {
       console.log("Error signing in:", error);
     }
@@ -139,7 +139,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   signUpLink: {
-    paddingTop: 24,
+    marginTop: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 4,
+    backgroundColor: "#0096C7",
   },
   underlineText: {
     textDecorationLine: "underline",

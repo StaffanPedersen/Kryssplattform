@@ -19,7 +19,7 @@ export default function RootLayout() {
     }
 
     if (!user) {
-        return <Redirect href="/authentication" />;
+        return <Redirect href="../authenticated/authentication" />;
     }
 
     return (

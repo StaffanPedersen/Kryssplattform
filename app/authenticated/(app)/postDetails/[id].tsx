@@ -195,9 +195,9 @@ export default function postDetails() {
                       if (post && commentText !== "") {
                         setIsLoadingAddComment(true);
                         const newComment = await commentApi.addComment(post.id, {
-                          authorId: user?.uid ?? "Tull",
+                          authorId: user?.uid ?? "empty",
                           comment: commentText,
-                          authorName: userNameSession ?? "Boogeyman",
+                          authorName: userNameSession ?? "empty",
                         });
                         if (newComment) {
                           visibleCommentIds.current.push(newComment);

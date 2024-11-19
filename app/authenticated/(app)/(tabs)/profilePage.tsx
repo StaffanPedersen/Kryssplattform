@@ -23,14 +23,12 @@ export default function ProfilePage() {
                 <Text style={styles.logoutButtonText}>Logg ut</Text>
               </Pressable>
           ) : (
-              <Link asChild href={{ pathname: "/authentication" }}>
+              <Link asChild href={{ pathname: "./authenticated/authentication" }}>
                 <Pressable style={styles.primaryButton}>
                   <Text style={{ color: "white" }}>Logg inn</Text>
                 </Pressable>
               </Link>
           )}
-          <HkButton italic theme="primary" title="Knapp!" onPress={() => {}} />
-          <HkButton bold theme="alert" title="Knapp!" onPress={() => {}} />
         </View>
       </View>
   );

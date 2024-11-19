@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 const TabsLayout = () => {
@@ -23,18 +23,30 @@ const TabsLayout = () => {
                         <AntDesign name="home" size={size} color={color} />
                     ),
                     headerTitle: () => (
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                color: "black",
-                            }}
-                        >
-                            Hjemmeside
-                        </Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text
+                                style={{
+                                    fontSize: 20,
+                                    fontWeight: "bold",
+                                    color: "black",
+                                }}
+                            >
+                                Hovedside
+                            </Text>
+                            <Text
+                                style={{
+                                    fontSize: 20,
+                                    fontWeight: "bold",
+                                    color: "black",
+                                    marginLeft: 10,
+                                }}
+                            >
+                                ArtVista
+                            </Text>
+                        </View>
                     ),
                     headerStyle: {
-                        backgroundColor: '#f4511e',
+                        backgroundColor: "#b67272",
                     },
                     headerTintColor: '#d7d1d1',
                     headerTitleStyle: {
@@ -77,7 +89,7 @@ const TabsLayout = () => {
                                 color: "black",
                             }}
                         >
-                            Profilside
+                            Din profil
                         </Text>
                     ),
                 }}

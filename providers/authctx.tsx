@@ -3,7 +3,6 @@ import { deleteData, storeData } from "@/utils/local_storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
-
 import {
   createContext,
   ReactNode,
@@ -65,13 +64,18 @@ export function rAuthSessionProvider({ children }: { children: ReactNode }) {
           value={{
             signIn: async (userName: string, password: string) => {
               await authApi.signIn(userName, password);
-              // setUserSession(userName);
-              // storeData("authSession", userName);
+              const user = auth.currentUser;
+              if (user) {
+                setUserSession(user.displayName);
+                setUserAuthSession(user);
+                router.replace("/authenticated/(app)/(tabs)");
+              }
             },
             signOut: async () => {
               await authApi.signOut();
-              // setUserSession(null);
-              // deleteData("authSession");
+              setUserSession(null);
+              setUserAuthSession(null);
+              router.push("/authenticated/authentication");
             },
             userNameSession: userSession,
             user: userAuthSession,
