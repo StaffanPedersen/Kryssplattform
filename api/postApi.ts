@@ -43,37 +43,6 @@ export const getAllPosts = async () => {
     return { ...doc.data(), id: doc.id } as PostData;
   });
 };
-export const getPaginatedPosts = async (
-    getFromDoc: QueryDocumentSnapshot<DocumentData> | null
-) => {
-  if (getFromDoc) {
-    const next = query(
-        collection(db, "posts"),
-        orderBy("title", "desc"),
-        startAfter(getFromDoc)
-    );
-    const querySnapshots = await getDocs(next);
-
-    const last = querySnapshots.docs[querySnapshots.docs.length - 1];
-    const result = querySnapshots.docs.map((doc) => {
-      console.log(doc.data());
-      return { ...doc.data(), id: doc.id } as PostData;
-    });
-    return { result, last };
-  }
-  const first = query(
-      collection(db, "posts"),
-      orderBy("title", "desc")
-  );
-  const querySnapshots = await getDocs(first);
-
-  const last = querySnapshots.docs[querySnapshots.docs.length - 1];
-  const result = querySnapshots.docs.map((doc) => {
-    console.log(doc.data());
-    return { ...doc.data(), id: doc.id } as PostData;
-  });
-  return { result, last };
-};
 
 export const getPostById = async (id: string) => {
   const specificPost = await getDoc(doc(db, "posts", id));

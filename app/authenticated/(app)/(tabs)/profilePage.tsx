@@ -1,12 +1,19 @@
-// Code from lecture or modified code from lecture
 import HkButton from "@/components/HkButton";
 import { useAuthSession } from "@/providers/authctx";
 import { Link, useRouter } from "expo-router";
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { deleteData } from "@/utils/local_storage"; // Import deleteData function
 
 export default function ProfilePage() {
   const { user, signOut } = useAuthSession();
   const router = useRouter();
+
+  const clearLocalStorage = async () => {
+    await deleteData("posts");
+    await deleteData("user");
+    // Add any other keys you want to remove
+    console.log("Local storage cleared");
+  };
 
   return (
       <View className="flex-1 justify-center items-center bg-slate-600">
@@ -15,14 +22,23 @@ export default function ProfilePage() {
 
         <View style={{ paddingTop: 20 }}>
           {user ? (
-              <Pressable
-                  style={styles.logoutButton}
-                  onPress={async () => {
-                    signOut();
-                  }}
-              >
-                <Text style={styles.logoutButtonText}>Logg ut</Text>
-              </Pressable>
+              <>
+                <Pressable
+                    style={styles.logoutButton}
+                    onPress={async () => {
+                      signOut();
+                    }}
+                >
+                  <Text style={styles.logoutButtonText}>Logg ut</Text>
+                </Pressable>
+                {/*testing clearing cache for phone*/}
+                <Pressable
+                    style={styles.clearButton}
+                    onPress={clearLocalStorage}
+                >
+                  <Text style={styles.clearButtonText}>Clear Cache</Text>
+                </Pressable>
+              </>
           ) : (
               <Link asChild href={{ pathname: "./authenticated/authentication" }}>
                 <Pressable style={styles.primaryButton}>
@@ -55,9 +71,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "red",
     maxWidth: 100,
-    margin:  10 ,
+    margin: 10,
   },
   logoutButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  clearButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 4,
+    backgroundColor: "blue",
+    maxWidth: 100,
+    margin: 10,
+  },
+  clearButtonText: {
     color: "white",
     fontWeight: "bold",
   },

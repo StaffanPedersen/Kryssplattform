@@ -24,6 +24,7 @@ export const getData = async (key: string) => {
 export const deleteData = async (key: string) => {
   try {
     await AsyncStorage.removeItem(key);
+    console.log("Deleted data with key", key);
   } catch (e) {
     console.error(e);
   }

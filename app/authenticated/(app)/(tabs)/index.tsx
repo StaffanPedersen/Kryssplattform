@@ -25,6 +25,7 @@ import Spacer from "@/components/Spacer";
 import { useAuthSession } from "@/providers/authctx";
 import * as postApi from "@/api/postApi";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import {getAllPosts} from "@/api/postApi";
 
 export default function Index() {
     const [posts, setPosts] = useState<PostData[]>([]);
@@ -45,22 +46,24 @@ export default function Index() {
         }
     };
 
-    const getPostsFromBackend = async (isLoadMore = false) => {
+
+
+    const getPostsFromBackend = async () => {
         setRefreshing(true);
-        const { result: newPosts, last: lastDoc } = await postApi.getPaginatedPosts(
-            lastDocRef.current
-        );
-        lastDocRef.current = lastDoc;
+        const fetchedPosts = await getAllPosts();
+        const localPosts = await getData("posts");
+        const parsedLocalPosts: PostData[] = localPosts ? JSON.parse(localPosts) : [];
 
-        const combinedPosts = [...posts, ...newPosts];
-
-        const uniquePosts = Array.from(new Set(combinedPosts.map(post => post.id)))
-            .map(id => combinedPosts.find(post => post.id === id))
-            .filter((post): post is PostData => post !== undefined);
+        const allPosts = [...fetchedPosts, ...parsedLocalPosts];
+        const uniquePosts = Array.from(new Set(allPosts.map(post => post.id)))
+            .map(id => allPosts.find(post => post.id === id))
+            .filter((post): post is PostData => post !== undefined && !post.isDeleted);
 
         setPosts(uniquePosts);
         setRefreshing(false);
+        storeData("posts", JSON.stringify(uniquePosts));
     };
+
 
     const deletePost = async (postId: string) => {
         if (userNameSession) {
@@ -157,7 +160,7 @@ export default function Index() {
                         onRefresh={getPostsFromBackend}
                     />
                 }
-                onEndReached={() => getPostsFromBackend(true)}
+                onEndReached={getPostsFromBackend}
                 onEndReachedThreshold={0.5}
                 renderItem={({ item }) => (
                     <Post
