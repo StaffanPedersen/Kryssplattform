@@ -17,7 +17,8 @@ import * as Location from "expo-location";
 import * as postApi from "@/api/postApi";
 import { useAuthSession } from "@/providers/authctx";
 import { LocationObjectCoords } from "expo-location";
-import {uuidv4} from "@firebase/util";
+import { uuidv4 } from "@firebase/util";
+import {router, useRouter} from "expo-router";
 
 type PostFormProps = {
   addNewPost: (newPost?: PostData) => void;
@@ -37,6 +38,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
   const [location, setLocation] = useState<Location.LocationGeocodedAddress | null>(null);
 
   const postCoordinatesData = useRef<Location.LocationObjectCoords | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -165,6 +167,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
                     setDescriptionText("");
                     setHashtagText("");
                     setImage(null); // Clear image after posting
+                    router.push("/authenticated/(app)/(tabs)");
                   }}
                   accessibilityLabel="Add post"
               >

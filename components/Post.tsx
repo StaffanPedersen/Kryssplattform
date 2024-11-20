@@ -1,19 +1,20 @@
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import {View, Text, Image, StyleSheet, Pressable} from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Link } from "expo-router";
-import { PostData } from "@/utils/postData";
+import {Link} from "expo-router";
+import {PostData} from "@/utils/postData";
 import * as postApi from "@/api/postApi";
-import { useAuthSession } from "@/providers/authctx";
-import { useState } from "react";
+import {useAuthSession} from "@/providers/authctx";
+import {useState} from "react";
 
 type PostProps = {
     postData: PostData,
     toggleLike: (id: string) => void,
-    disabled?: boolean
+    disabled?: boolean,
+    deletePost?: (postId: string) => Promise<void>
 };
 
-export default function Post({ postData, toggleLike, disabled }: PostProps) {
-    const { user } = useAuthSession();
+export default function Post({postData, toggleLike, disabled, deletePost}: PostProps) {
+    const {user} = useAuthSession();
 
     const [isLiked, setIsLiked] = useState(
         postData.likes?.includes(user?.uid ?? "") ?? false
@@ -27,7 +28,7 @@ export default function Post({ postData, toggleLike, disabled }: PostProps) {
         >
             <Pressable>
                 <View style={styles.postContainer}>
-                    <Image style={styles.postImage} source={{ uri: postData.imageURL }} />
+                    <Image style={styles.postImage} source={{uri: postData.imageURL}}/>
                     <View style={styles.textContainer}>
                         <View style={styles.titleContainer}>
                             <Text style={styles.postTitle}>{postData.title}</Text>
@@ -74,7 +75,7 @@ export default function Post({ postData, toggleLike, disabled }: PostProps) {
 const styles = StyleSheet.create({
     postContainer: {
         backgroundColor: "white",
-        shadowOffset: { width: 0, height: 6 },
+        shadowOffset: {width: 0, height: 6},
         shadowColor: "black",
         shadowOpacity: 0.05,
         shadowRadius: 8,

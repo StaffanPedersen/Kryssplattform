@@ -1,3 +1,4 @@
+// app/authenticated/(app)/(tabs)/index.tsx
 import {
     StyleSheet,
     View,
@@ -13,6 +14,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Stack } from "expo-router";
 import { getData, storeData } from "@/utils/local_storage";
+import { deleteData } from "@/utils/local_storage";
 import PostForm from "@/components/PostForm";
 import UpsertUser from "@/components/UpsertUser";
 import '../../../../global.css';
@@ -58,6 +60,18 @@ export default function Index() {
 
         setPosts(uniquePosts);
         setRefreshing(false);
+    };
+
+    const deletePost = async (postId: string) => {
+        if (userNameSession) {
+            await postApi.deletePost(postId, userNameSession);
+            const updatedPosts = posts.filter(post => post.id !== postId);
+            setPosts(updatedPosts);
+            await storeData("posts", JSON.stringify(updatedPosts));
+            window.location.reload(); // Force page reload
+        } else {
+            console.error("User is not logged in");
+        }
     };
 
     useEffect(() => {
@@ -161,6 +175,7 @@ export default function Index() {
                             setPosts(tempPosts);
                             storeData("posts", JSON.stringify(tempPosts));
                         }}
+                        deletePost={deletePost}
                     />
                 )}
                 keyExtractor={(item) => item.id}
@@ -201,3 +216,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
 });
+
+// utils/local_storage.ts
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+
+// api/postApi.ts

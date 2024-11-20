@@ -16,7 +16,9 @@ import {
   where,
 } from "firebase/firestore";
 import { db, getDownloadUrl } from "@/firebaseConfig";
-import { uploadImageToFirebase } from "./imageApi";
+import { uploadImageToFirebase } from "./imageApi";''
+import { deleteData } from "@/utils/local_storage";
+import {router} from "expo-router";
 
 export const createPost = async (post: PostData) => {
   try {
@@ -28,7 +30,7 @@ export const createPost = async (post: PostData) => {
     const postWithImageData: PostData = {
       ...post,
       imageURL: postImageDownloadUrl,
-      authorId: post.authorId, // Ensure authorId is included
+      authorId: post.authorId,
     };
     const docRef = await addDoc(collection(db, "posts"), postWithImageData);
     console.log("Document written with ID:", docRef.id);
@@ -51,7 +53,6 @@ export const getPaginatedPosts = async (
         collection(db, "posts"),
         orderBy("title", "desc"),
         startAfter(getFromDoc),
-        limit(10) // Set an appropriate limit
     );
     const querySnapshots = await getDocs(next);
 
@@ -91,6 +92,7 @@ export const deletePost = async (id: string, userId: string) => {
     const post = await getDoc(postRef);
     if (post.exists() && post.data()?.authorId === userId) {
       await deleteDoc(postRef);
+      await deleteData(id); // Call deleteData to remove from local storage
       console.log("Document successfully deleted!");
     } else {
       console.error("Error: User is not authorized to delete this post");
@@ -99,6 +101,8 @@ export const deletePost = async (id: string, userId: string) => {
     console.error("Error removing document: ", e);
   }
 };
+
+
 export const toggleLikePost = async (id: string, userId: string) => {
   const postRef = doc(db, "posts", id);
   const post = await getDoc(postRef);

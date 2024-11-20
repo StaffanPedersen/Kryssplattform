@@ -86,7 +86,7 @@ export default function postDetails() {
                         <Pressable
                             onPress={async () => {
                               await postApi.deletePost(id as string, user?.uid ?? "");
-                              router.back();
+                              router.push("/authenticated/(app)/(tabs)");
                             }}
                         >
                           <Text style={{color: "red"}}>Slett</Text>
