@@ -17,8 +17,7 @@ import {
 } from "firebase/firestore";
 import { db, getDownloadUrl } from "@/firebaseConfig";
 import { uploadImageToFirebase } from "./imageApi";''
-import { deleteData } from "@/utils/local_storage";
-import {router} from "expo-router";
+import {deleteData, getData, storeData} from "@/utils/local_storage";
 
 export const createPost = async (post: PostData) => {
   try {
@@ -44,15 +43,14 @@ export const getAllPosts = async () => {
     return { ...doc.data(), id: doc.id } as PostData;
   });
 };
-
 export const getPaginatedPosts = async (
-    getFromDoc: QueryDocumentSnapshot<DocumentData, DocumentData> | null
+    getFromDoc: QueryDocumentSnapshot<DocumentData> | null
 ) => {
   if (getFromDoc) {
     const next = query(
         collection(db, "posts"),
         orderBy("title", "desc"),
-        startAfter(getFromDoc),
+        startAfter(getFromDoc)
     );
     const querySnapshots = await getDocs(next);
 
@@ -65,7 +63,7 @@ export const getPaginatedPosts = async (
   }
   const first = query(
       collection(db, "posts"),
-      orderBy("title", "desc"),
+      orderBy("title", "desc")
   );
   const querySnapshots = await getDocs(first);
 
@@ -76,6 +74,7 @@ export const getPaginatedPosts = async (
   });
   return { result, last };
 };
+
 export const getPostById = async (id: string) => {
   const specificPost = await getDoc(doc(db, "posts", id));
   console.log("post by spesific id", specificPost.data());
@@ -92,6 +91,10 @@ export const deletePost = async (id: string, userId: string) => {
     if (post.exists() && post.data()?.authorId === userId) {
       await deleteDoc(postRef);
       await deleteData(id);
+      const localPosts = await getData("posts");
+      const parsedLocalPosts: PostData[] = localPosts ? JSON.parse(localPosts) : [];
+      const updatedLocalPosts = parsedLocalPosts.filter(post => post.id !== id);
+      storeData("posts", JSON.stringify(updatedLocalPosts));
       console.log("Document successfully deleted!");
     } else {
       console.error("Error: User is not authorized to delete this post");

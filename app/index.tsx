@@ -48,7 +48,7 @@ const Welcome = () => {
         const allPosts = [...fetchedPosts, ...parsedLocalPosts];
         const uniquePosts = Array.from(new Set(allPosts.map(post => post.id)))
             .map(id => allPosts.find(post => post.id === id))
-            .filter((post): post is PostData => post !== undefined);
+            .filter((post): post is PostData => post !== undefined && !post.isDeleted);
 
         setPosts(uniquePosts);
         setRefreshing(false);
@@ -70,7 +70,7 @@ const Welcome = () => {
                 data={posts}
                 keyExtractor={(item: PostData) => item.id}
                 renderItem={({ item }) => (
-                    <Link href={{ pathname: `./PostDetails/[id]`, params: { id: item.id } }}>
+                    <Link href={{ pathname: `/PostDetails/[id]`, params: { id: item.id } }}>
                         <PublicPost postData={item} resizeMode="cover" />
                     </Link>
                 )}

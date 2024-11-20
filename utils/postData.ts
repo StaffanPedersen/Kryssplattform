@@ -13,6 +13,7 @@ export interface PostData {
   imageURL: string;
   postCoordinates: LocationObjectCoords | null;
   comments: string[];
+  isDeleted?: boolean;
 }
 
 export interface CommentObject {
