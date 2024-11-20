@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { LocationObjectCoords } from "expo-location";
 
 export interface PostData {

@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { db } from "@/firebaseConfig";
 import { CommentData, CommentObject } from "@/utils/postData";
 import {

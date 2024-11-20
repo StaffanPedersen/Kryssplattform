@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import React from "react";
 import { View } from "react-native";
 

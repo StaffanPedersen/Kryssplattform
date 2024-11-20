@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { getData } from "@/utils/local_storage";
 import { PostData } from "@/utils/postData";
 import { useEffect, useState } from "react";

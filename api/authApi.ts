@@ -1,5 +1,5 @@
+// Code from lecture or modified code from lecture
 import { auth } from "@/firebaseConfig";
-import { useRouter } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -16,8 +16,6 @@ export const signIn = async (email: string, password: string) => {
             console.log("Oops, kunne ikke logge inn", error);
         });
 };
-
-
 
 export const signOut = async () => {
   await auth.signOut().then(() => {

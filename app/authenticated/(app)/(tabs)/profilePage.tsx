@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import HkButton from "@/components/HkButton";
 import { useAuthSession } from "@/providers/authctx";
 import { Link, useRouter } from "expo-router";

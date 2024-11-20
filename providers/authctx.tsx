@@ -1,3 +1,5 @@
+// Code from lecture or modified code from lecture
+
 import { auth } from "@/firebaseConfig";
 import { deleteData, storeData } from "@/utils/local_storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";

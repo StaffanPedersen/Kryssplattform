@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { getPostFromLocalById } from "@/utils/local_storage";
 import { CommentObject, PostData } from "@/utils/postData";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";

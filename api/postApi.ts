@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { PostData } from "@/utils/postData";
 import {
   addDoc,
@@ -7,7 +8,6 @@ import {
   DocumentData,
   getDoc,
   getDocs,
-  limit,
   orderBy,
   query,
   QueryDocumentSnapshot,
@@ -66,7 +66,6 @@ export const getPaginatedPosts = async (
   const first = query(
       collection(db, "posts"),
       orderBy("title", "desc"),
-      limit(10) // Set an appropriate limit
   );
   const querySnapshots = await getDocs(first);
 
@@ -92,7 +91,7 @@ export const deletePost = async (id: string, userId: string) => {
     const post = await getDoc(postRef);
     if (post.exists() && post.data()?.authorId === userId) {
       await deleteDoc(postRef);
-      await deleteData(id); // Call deleteData to remove from local storage
+      await deleteData(id);
       console.log("Document successfully deleted!");
     } else {
       console.error("Error: User is not authorized to delete this post");
@@ -106,7 +105,6 @@ export const deletePost = async (id: string, userId: string) => {
 export const toggleLikePost = async (id: string, userId: string) => {
   const postRef = doc(db, "posts", id);
   const post = await getDoc(postRef);
-  // Beklager litt stygg kode her med ? og !
   if (post.data()?.likes) {
     const likes = post.data()!.likes;
     if (likes.includes(userId)) {

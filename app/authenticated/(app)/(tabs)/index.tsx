@@ -1,4 +1,4 @@
-// app/authenticated/(app)/(tabs)/index.tsx
+// Code from lecture or modified code from lecture
 import {
     StyleSheet,
     View,
@@ -68,7 +68,6 @@ export default function Index() {
             const updatedPosts = posts.filter(post => post.id !== postId);
             setPosts(updatedPosts);
             await storeData("posts", JSON.stringify(updatedPosts));
-            window.location.reload(); // Force page reload
         } else {
             console.error("User is not logged in");
         }
@@ -86,8 +85,6 @@ export default function Index() {
         if (!searchString) return posts;
         return posts.filter(post =>
                 post.title.toLowerCase().includes(searchString.toLowerCase())
-            // Ensure 'content' is a valid property or remove this line
-            // post.content.toLowerCase().includes(searchString.toLowerCase())
         );
     };
 
@@ -217,8 +214,3 @@ const styles = StyleSheet.create({
     },
 });
 
-// utils/local_storage.ts
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
-// api/postApi.ts

@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { Pressable, Text } from "react-native";
 
 type HkButtonProps = {

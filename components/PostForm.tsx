@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import { PostData } from "@/utils/postData";
 import { useEffect, useRef, useState } from "react";
 import {

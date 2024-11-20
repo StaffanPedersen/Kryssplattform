@@ -1,3 +1,4 @@
+// Code from lecture or modified code from lecture
 import {View, Text, Image, StyleSheet, Pressable} from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {Link} from "expo-router";

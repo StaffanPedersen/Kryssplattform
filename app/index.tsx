@@ -68,7 +68,7 @@ const Welcome = () => {
                     paddingHorizontal: 20,
                 }}
                 data={posts}
-                keyExtractor={(item: PostData) => item.id} // Ensure unique keys
+                keyExtractor={(item: PostData) => item.id}
                 renderItem={({ item }) => (
                     <Link href={{ pathname: `./PostDetails/[id]`, params: { id: item.id } }}>
                         <PublicPost postData={item} resizeMode="cover" />

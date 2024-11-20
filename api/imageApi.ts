@@ -1,5 +1,6 @@
+// Code from lecture or modified code from lecture
 import { getStorageRef } from "@/firebaseConfig";
-import { uploadBytes, uploadBytesResumable } from "firebase/storage";
+import {  uploadBytesResumable } from "firebase/storage";
 
 export const uploadImageToFirebase = async (uri: string) => {
   const fetchResponse = await fetch(uri);
