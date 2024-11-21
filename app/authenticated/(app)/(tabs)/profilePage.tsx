@@ -1,53 +1,31 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Image,
-  FlatList,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, Image, FlatList } from "react-native";
 import { useAuthSession } from "@/providers/authctx";
 import { Link } from "expo-router";
-import { deleteData } from "@/utils/local_storage";
-import { getAllPosts } from "@/api/postApi";
+import { usePosts } from "@/providers/postctx";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useFocusEffect } from "@react-navigation/native";
-
-interface PostData {
-  id: string;
-  authorId: string;
-  imageURL: string;
-  title: string;
-  likes: string[];
-  averageRating?: number;
-}
+import { PostData } from "@/utils/postData";
+import * as postApi from "@/api/postApi";
 
 const ProfilePage = () => {
   const { user, signOut } = useAuthSession();
+  const { posts, fetchPosts } = usePosts();
   const [userPosts, setUserPosts] = useState<PostData[]>([]);
 
-  const fetchUserPosts = async () => {
+  const fetchUserPosts = useCallback(async () => {
     if (user) {
-      const allPosts = await getAllPosts();
-      const filteredPosts = allPosts.filter(
-          (post) => post.authorId === user.uid
-      );
+      await fetchPosts(); // Fetch the latest posts from the backend
+      const filteredPosts = posts.filter((post) => post.authorId === user.uid);
       setUserPosts(filteredPosts);
     }
-  };
+  }, [posts, user, fetchPosts]);
 
   useFocusEffect(
       useCallback(() => {
         fetchUserPosts();
-      }, [user])
+      }, [fetchUserPosts])
   );
-
-  const clearLocalStorage = async () => {
-    await deleteData("posts");
-    await deleteData("user");
-    console.log("Local storage cleared");
-  };
 
   const renderItem = ({ item }: { item: PostData }) => (
       <Link href={`/authenticated/postDetails/${item.id}`}>
@@ -81,9 +59,6 @@ const ProfilePage = () => {
                 >
                   <Text style={styles.logoutButtonText}>Logg ut</Text>
                 </Pressable>
-                <Pressable style={styles.clearButton} onPress={clearLocalStorage}>
-                  <Text style={styles.clearButtonText}>Clear Cache</Text>
-                </Pressable>
                 <Text style={styles.postsTitle}>My posts</Text>
                 <FlatList
                     data={userPosts}
@@ -102,7 +77,7 @@ const ProfilePage = () => {
         </View>
       </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   primaryButton: {
