@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,9 @@ import {
 import { useAuthSession } from "@/providers/authctx";
 import { Link } from "expo-router";
 import { deleteData } from "@/utils/local_storage";
-import { getAllPosts } from "@/api/postApi"; // Import the function to get all posts
+import { getAllPosts } from "@/api/postApi";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface PostData {
   id: string;
@@ -18,24 +20,28 @@ interface PostData {
   imageURL: string;
   title: string;
   likes: string[];
+  averageRating?: number;
 }
 
-export default function ProfilePage() {
+const ProfilePage = () => {
   const { user, signOut } = useAuthSession();
   const [userPosts, setUserPosts] = useState<PostData[]>([]);
 
-  useEffect(() => {
-    const fetchUserPosts = async () => {
-      if (user) {
-        const allPosts = await getAllPosts();
-        const filteredPosts = allPosts.filter(
-            (post) => post.authorId === user.uid
-        );
-        setUserPosts(filteredPosts);
-      }
-    };
-    fetchUserPosts();
-  }, [user]);
+  const fetchUserPosts = async () => {
+    if (user) {
+      const allPosts = await getAllPosts();
+      const filteredPosts = allPosts.filter(
+          (post) => post.authorId === user.uid
+      );
+      setUserPosts(filteredPosts);
+    }
+  };
+
+  useFocusEffect(
+      useCallback(() => {
+        fetchUserPosts();
+      }, [user])
+  );
 
   const clearLocalStorage = async () => {
     await deleteData("posts");
@@ -48,7 +54,13 @@ export default function ProfilePage() {
         <View style={styles.postItem}>
           <Image source={{ uri: item.imageURL }} style={styles.postImage} />
           <Text style={styles.postTitle}>{item.title}</Text>
-          <Text style={styles.likesCount}>{item.likes.length} likes</Text>
+          <View style={styles.likesAndRating}>
+            <Text style={styles.likesCount}>{item.likes.length} likes</Text>
+            <View style={styles.ratingContainer}>
+              <AntDesign name="star" size={16} color="#FFD700" />
+              <Text style={styles.ratingText}>{item.averageRating?.toFixed(1) ?? "0.0"}</Text>
+            </View>
+          </View>
         </View>
       </Link>
   );
@@ -69,9 +81,9 @@ export default function ProfilePage() {
                 >
                   <Text style={styles.logoutButtonText}>Logg ut</Text>
                 </Pressable>
-                {/*<Pressable style={styles.clearButton} onPress={clearLocalStorage}>*/}
-                {/*  <Text style={styles.clearButtonText}>Clear Cache</Text>*/}
-                {/*</Pressable>*/}
+                <Pressable style={styles.clearButton} onPress={clearLocalStorage}>
+                  <Text style={styles.clearButtonText}>Clear Cache</Text>
+                </Pressable>
                 <Text style={styles.postsTitle}>My posts</Text>
                 <FlatList
                     data={userPosts}
@@ -165,4 +177,19 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
+  likesAndRating: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 10,
+  },
+  ratingText: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
 });
+
+export default ProfilePage;

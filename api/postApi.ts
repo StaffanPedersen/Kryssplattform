@@ -95,7 +95,29 @@ export const toggleLikePost = async (id: string, userId: string) => {
   }
 };
 
+export const ratePost = async (postId: string, rating: number, userId: string): Promise<number> => {
+  const postRef = doc(db, "posts", postId);
+  const postDoc = await getDoc(postRef);
+
+  if (postDoc.exists()) {
+    const postData = postDoc.data() as PostData;
+    const newRatingsCount = (postData.ratingsCount ?? 0) + 1;
+    const newAverageRating = ((postData.averageRating ?? 0) * (postData.ratingsCount ?? 0) + rating) / newRatingsCount;
+
+    await updateDoc(postRef, {
+      averageRating: newAverageRating,
+      ratingsCount: newRatingsCount,
+    });
+
+
+    return newAverageRating;
+  } else {
+    throw new Error("Post not found");
+  }
+};
+
 export const getSortedPosts = async (isRising: boolean) => {
+
   try {
     const querySnapshot = await getDocs(
       query(
