@@ -1,23 +1,19 @@
-// Code from lecture or modified code from lecture
 import { PostData } from "@/utils/postData";
 import {
   addDoc,
   collection,
   deleteDoc,
   doc,
-  DocumentData,
   getDoc,
   getDocs,
   orderBy,
   query,
-  QueryDocumentSnapshot,
-  startAfter,
   updateDoc,
   where,
 } from "firebase/firestore";
 import { db, getDownloadUrl } from "@/firebaseConfig";
-import { uploadImageToFirebase } from "./imageApi";''
-import {deleteData, getData, storeData} from "@/utils/local_storage";
+import { uploadImageToFirebase } from "./imageApi";
+import { deleteData, getData, storeData } from "@/utils/local_storage";
 
 export const createPost = async (post: PostData) => {
   try {
@@ -37,6 +33,7 @@ export const createPost = async (post: PostData) => {
     console.log("Error adding document", e);
   }
 };
+
 export const getAllPosts = async () => {
   const queryResult = await getDocs(collection(db, "posts"));
   return queryResult.docs.map((doc) => {
@@ -46,7 +43,7 @@ export const getAllPosts = async () => {
 
 export const getPostById = async (id: string) => {
   const specificPost = await getDoc(doc(db, "posts", id));
-  console.log("post by spesific id", specificPost.data());
+  console.log("post by specific id", specificPost.data());
   return {
     ...specificPost.data(),
     id: specificPost.id,
@@ -72,7 +69,6 @@ export const deletePost = async (id: string, userId: string) => {
     console.error("Error removing document: ", e);
   }
 };
-
 
 export const toggleLikePost = async (id: string, userId: string) => {
   const postRef = doc(db, "posts", id);
@@ -101,14 +97,20 @@ export const ratePost = async (postId: string, rating: number, userId: string): 
 
   if (postDoc.exists()) {
     const postData = postDoc.data() as PostData;
+
+    // Check if the user has already rated the post
+    if (postData.userRating && postData.userRating[userId]) {
+      throw new Error("User has already rated this post");
+    }
+
     const newRatingsCount = (postData.ratingsCount ?? 0) + 1;
     const newAverageRating = ((postData.averageRating ?? 0) * (postData.ratingsCount ?? 0) + rating) / newRatingsCount;
 
     await updateDoc(postRef, {
       averageRating: newAverageRating,
       ratingsCount: newRatingsCount,
+      [`userRating.${userId}`]: rating, // Store the user's rating
     });
-
 
     return newAverageRating;
   } else {
@@ -117,13 +119,12 @@ export const ratePost = async (postId: string, rating: number, userId: string): 
 };
 
 export const getSortedPosts = async (isRising: boolean) => {
-
   try {
     const querySnapshot = await getDocs(
-      query(
-        collection(db, "posts"),
-        orderBy("title", isRising ? "asc" : "desc")
-      )
+        query(
+            collection(db, "posts"),
+            orderBy("title", isRising ? "asc" : "desc")
+        )
     );
     return querySnapshot.docs.map((doc) => {
       console.log(doc.data());
@@ -139,11 +140,11 @@ export const getSearchedPosts = async (searchString: string) => {
   try {
     const endString = searchString + "\uf8ff";
     const querySnapshot = await getDocs(
-      query(
-        collection(db, "posts"),
-        where("title", ">=", searchString),
-        where("title", "<=", endString)
-      )
+        query(
+            collection(db, "posts"),
+            where("title", ">=", searchString),
+            where("title", "<=", endString)
+        )
     );
     return querySnapshot.docs.map((doc) => {
       console.log(doc.data());
@@ -158,13 +159,13 @@ export const getSearchedPosts = async (searchString: string) => {
 export const getLocalSearchedPosts = async (searchString: string) => {
   const queryResult = await getDocs(collection(db, "posts"));
   return queryResult.docs
-    .map((doc) => {
-      console.log(doc.data());
-      return { ...doc.data(), id: doc.id } as PostData;
-    })
-    .filter(
-      (post) =>
-        post.title &&
-        post.title.toLowerCase().includes(searchString.toLowerCase())
-    );
+      .map((doc) => {
+        console.log(doc.data());
+        return { ...doc.data(), id: doc.id } as PostData;
+      })
+      .filter(
+          (post) =>
+              post.title &&
+              post.title.toLowerCase().includes(searchString.toLowerCase())
+      );
 };

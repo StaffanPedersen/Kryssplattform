@@ -16,12 +16,7 @@ export interface PostData {
   averageRating?: number;
   ratingsCount?: number;
   isDeleted?: boolean;
-}
-
-
-export interface CommentObject {
-  id: string;
-  comment: CommentData;
+  userRating?: { [key: string]: number }; // Added missing closing brace and semicolon
 }
 
 export interface CommentData {

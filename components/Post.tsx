@@ -19,10 +19,16 @@ export default function Post({ postData, toggleLike, disabled, deletePost }: Pos
     const [isLiked, setIsLiked] = useState(postData.likes?.includes(user?.uid ?? '') ?? false);
     const [numLikes, setNumLikes] = useState(postData.likes?.length ?? 0);
     const [averageRating, setAverageRating] = useState(postData.averageRating ?? 0);
+    const [userRating, setUserRating] = useState(postData.userRating?.[user?.uid ?? ''] ?? 0);
 
     const handleRate = async (rating: number) => {
+        if (userRating) {
+            alert("You have already rated this post");
+            return;
+        }
         const newAverageRating = await postApi.ratePost(postData.id, rating, user?.uid ?? '');
         setAverageRating(newAverageRating);
+        setUserRating(rating);
     };
 
     return (
@@ -58,6 +64,7 @@ export default function Post({ postData, toggleLike, disabled, deletePost }: Pos
                         </View>
                         <StarRating rating={averageRating} onRate={handleRate} />
                         <Text>Average Rating: {averageRating.toFixed(1)}</Text>
+                        {userRating > 0 && <Text>Your Rating: {userRating}</Text>}
                     </View>
                 </View>
             </Pressable>
