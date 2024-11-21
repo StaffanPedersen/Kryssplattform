@@ -91,7 +91,7 @@ export const toggleLikePost = async (id: string, userId: string) => {
   }
 };
 
-export const ratePost = async (postId: string, rating: number, userId: string): Promise<number> => {
+export const ratePost = async (postId: string, rating: number, userId: string): Promise<PostData> => {
   const postRef = doc(db, "posts", postId);
   const postDoc = await getDoc(postRef);
 
@@ -112,7 +112,7 @@ export const ratePost = async (postId: string, rating: number, userId: string): 
       [`userRating.${userId}`]: rating, // Store the user's rating
     });
 
-    return newAverageRating;
+    return { ...postData, averageRating: newAverageRating, ratingsCount: newRatingsCount, userRating: { ...postData.userRating, [userId]: rating } };
   } else {
     throw new Error("Post not found");
   }
